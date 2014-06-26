@@ -2,6 +2,7 @@
 
 namespace Knp\Provider;
 
+use Knp\Migration\Manager;
 use Silex\ServiceProviderInterface;
 use Silex\Application;
 
@@ -19,7 +20,12 @@ class MigrationServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app['migration'] = $app->share(function() use ($app) {
-            return new MigrationManager($app['db'], $app, Finder::create()->in($app['migration.path']));
+            return new MigrationManager(
+                $app['db'],
+                $app,
+                Finder::create()->in($app['migration.path']),
+                empty($app['migration.namespace']) ? Manager::DEFAULT_NAMESPACE : $app['migration.namespace']
+            );
         });
 
         $app['dispatcher']->addListener(ConsoleEvents::INIT, function(ConsoleEvent $event) {

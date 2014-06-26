@@ -9,6 +9,8 @@ use Symfony\Component\Finder\Finder;
 
 class Manager
 {
+    const DEFAULT_NAMESPACE = '\\Migration\\';
+
     private $application;
 
     private $schema;
@@ -21,13 +23,20 @@ class Manager
 
     private $migrationExecuted = 0;
 
-    public function __construct(Connection $connection, Application $application, Finder $finder)
-    {
+    private $namespace;
+
+    public function __construct(
+        Connection $connection,
+        Application $application,
+        Finder $finder,
+        $namespace
+    ) {
         $this->schema      = $connection->getSchemaManager()->createSchema();
         $this->toSchema    = clone($this->schema);
         $this->connection  = $connection;
         $this->finder      = $finder;
         $this->application = $application;
+        $this->namespace    = $namespace;
     }
 
     private function buildSchema(Schema $schema)
@@ -46,19 +55,19 @@ class Manager
 
         $finder
             ->files()
-            ->name('*Migration.php')
+            ->name('Migration*.php')
             ->sortByName()
         ;
 
         foreach ($finder as $migration) {
-            if (preg_match('/^(\d+)_(.*Migration).php$/', basename($migration), $matches)) {
+            if (preg_match('/^(Migration(\d+)).php$/', basename($migration), $matches)) {
 
-                list(, $version, $class) = $matches;
+                list(, $class, $version) = $matches;
 
                 if ((int) ltrim($version, 0) > $from) {
                     require_once $migration;
 
-                    $fqcn = '\\Migration\\'.$class;
+                    $fqcn = $this->namespace . $class;
 
                     if (!class_exists($fqcn)) {
                         throw new \RuntimeException(sprintf('Could not find class "%s" in "%s"', $fqcn, $migration));

@@ -11,7 +11,7 @@ abstract class AbstractMigration
     {
         $rc = new \ReflectionClass($this);
 
-        if (preg_match('/^(\d+)/', basename($rc->getFileName()), $matches)) {
+        if (preg_match('/(\d+)\.php$/', basename($rc->getFileName()), $matches)) {
             return (int) ltrim($matches[1], 0);
         }
 

@@ -8,7 +8,8 @@ As usual, just include `knplabs/migration-service-provider` in your `composer.js
 
 ```php
 $app->register(new \Knp\Provider\MigrationServiceProvider(), array(
-    'migration.path' => __DIR__.'/../src/Resources/migration'
+    'migration.path' => __DIR__.'/../src/Resources/migration',
+    'migration.namespace' => 'App\\Migration\\' // optional
 ));
 ```
 
@@ -18,6 +19,12 @@ And I am too lazy to write a comprehensive documentation right now, so you will 
 
 1. [The marketplace's migrations](https://github.com/KnpLabs/marketplace/tree/master/src/Resources/migrations)
 2. [The official documentation for Doctrine's DBAL Schema Manager](http://readthedocs.org/docs/doctrine-dbal/en/latest/reference/schema-manager.html)
+
+## Migration template
+
+Migration templates now are PSR compatible.
+The template for filename is Migration{{time()}}.php for example Migration1403707027.php
+The class name template is the same Migration1403707027.
 
 ## Running migrations
 
